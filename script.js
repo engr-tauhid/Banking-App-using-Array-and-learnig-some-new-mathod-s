@@ -64,6 +64,15 @@ const inputClosePin = document.querySelector('.form__input--pin');
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
+// impleminting usler name for each of those account here 
+// fast see how the code look like for simplyfy the function work
+// let demoName = 'Tauhid Islam Rafi';
+// let DemoUserName = demoName.toLowerCase().split(' ').map(name=>name[0]).join('');
+// console.log(DemoUserName)
+//you see like that instruction we are gonna create a function for all of our user that define there user name ;
+accounts.forEach(function(el){
+  el.userId = el.owner.toLowerCase().split(' ').map(fastPartofName => fastPartofName[0]).join('')
+})
 
 const currencies = new Map([
   ['USD', 'United States dollar'],
@@ -71,7 +80,7 @@ const currencies = new Map([
   ['GBP', 'Pound sterling'],
 ]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300, 450, -400, 3000, -650, -130, 70, 1300, 450, -400, 3000, -650, -130, 70, 1300, 450, -400, 3000, -650, -130, 70, 1300, 450, -400, 3000, -650, -130, 70, 1300];
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 containerMovements.innerHTML= '';
 function display (movements){
    movements.forEach(function(el,i){
@@ -95,8 +104,23 @@ display(account1.movements);
 //         containerMovements.insertAdjacentHTML('afterbegin',html);
 // }
 // dummyeliments(32432,1,'deposit')
-
-
+//now i am gonna see about the map mathod. The map mathod don't change the main array but it create a new array for that the map mathod is somthing like the forEach mathod but it return value from his call back function
+// const movementsUsd = movements.map(mov=>Math.trunc(mov * 1.1))
+// console.log(movementsUsd)
+// containerMovements.innerHTML = '';
+// function displayDataInUsd (movementsArr){
+// movementsArr.map(function(mov , i ){
+//   const type = mov >= 0 ? 'deposit' : "withdrawal"; 
+//   const html = `
+//    <div class="movements__row ${movements.join(' ')}">
+//           <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+//           <div class="movements__value">${mov}$</div>
+//         </div>
+//   `;
+//   containerMovements.insertAdjacentHTML('afterbegin',html)
+// })
+// }
+// displayDataInUsd(movementsUsd)
 /**
  * Create a function 'checkDogs', which accepts 2 arrays of dog's ages
 ('dogsJulia' and 'dogsKate'), and does the following things:
