@@ -63,24 +63,18 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
-// LECTURES
-// impleminting usler name for each of those account here 
-// fast see how the code look like for simplyfy the function work
-// let demoName = 'Tauhid Islam Rafi';
-// let DemoUserName = demoName.toLowerCase().split(' ').map(name=>name[0]).join('');
-// console.log(DemoUserName)
-//you see like that instruction we are gonna create a function for all of our user that define there user name ;
-accounts.forEach(function(el){
-  el.userId = el.owner.toLowerCase().split(' ').map(fastPartofName => fastPartofName[0]).join('')
-})
-
+// console.log(account1 ,account3)
 const currencies = new Map([
   ['USD', 'United States dollar'],
   ['EUR', 'Euro'],
   ['GBP', 'Pound sterling'],
-]);
-
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+  ]);
+  /////////////////////////////////
+  const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+    accounts.forEach(function(el){
+      el.userId = el.owner.toLowerCase().split(' ').map(element => element[0]).join('');
+    })
+    /////////////////////
 containerMovements.innerHTML= '';
 function display (movements){
    movements.forEach(function(el,i){
@@ -94,7 +88,75 @@ function display (movements){
    })
 }
 display(account1.movements);
-// containerMovements.innerHTML='';
+/////balance
+// const calcBalance = function(movement){
+//   let balacnce = movement.reduce((acc , mov)=> acc + mov , 0)
+//   labelBalance.textContent=`${balacnce}$`;
+// }
+// calcBalance(account1.movements)
+///lable
+function dislplayLable(movement){
+let deposit = movement.filter(mov => mov > 0).reduce((acc , balance)=> acc + balance , 0)
+labelSumIn.textContent = `${deposit}€`
+let withdraw = movement.filter(mov => mov < 0).reduce((acc , balance)=> acc + balance , 0)
+labelSumOut.textContent = `${Math.abs(withdraw)}€`
+let interest = movement.map(el => Math.trunc(Math.abs((el * 1.1) / 100))).filter(el => el > 1).reduce((acc , mov)=> acc + mov , 0)
+labelSumInterest.textContent = `${interest}€`
+let balacnce = movement.reduce((acc , mov)=> acc + mov , 0)
+labelBalance.textContent=`${balacnce - interest}€`;
+
+
+}
+dislplayLable(account1.movements)
+// labelSumIn
+//from me if i click the short button;
+// let ShortonlydepositwithERO = function (){
+//   containerMovements.innerHTML= '';
+//   let usdToEuro = 1.1
+//     account1.movements.filter(mov => mov > 0).map(mov => Math.trunc(mov * usdToEuro)).forEach(function(mov , i){
+//       let html = `<div class="movements__row">
+//           <div class="movements__type movements__type--deposit">${i+1} deposit</div>
+//           <div class="movements__value">${mov} €</div>
+//         </div`
+//         containerMovements.insertAdjacentHTML('afterbegin' , html)
+//     });
+// }
+// btnSort.addEventListener('click',ShortonlydepositwithERO)
+
+///////////////
+// let alldeposit = movements.filter(function(el){
+//   return el > 0
+// })
+// console.log(alldeposit)
+//////////////The reduse mathod 
+// accounts.forEach(function(el){
+//   el.userId = el.owner.toLowerCase().split(' ').map(el=>el[0]).join('');
+//   console.log(el.userId)
+// })
+// LECTURES
+// impleminting usler name for each of those account here 
+// fast see how the code look like for simplyfy the function work
+// let demoName = 'Tauhid Islam Rafi';
+// let DemoUserName = demoName.toLowerCase().split(' ').map(name=>name[0]).join('');
+// console.log(DemoUserName)
+//you see like that instruction we are gonna create a function for all of our user that define there user name ;
+// accounts.forEach(function(el){
+//   el.userId = el.owner.toLowerCase().split(' ').map(fastPartofName => fastPartofName[0]).join('')
+// })
+// function display(element){
+//   element.forEach(function(el , i){
+//     const type = el >= 0? 'deposit' : 'withdrawal';
+//     const html = ` <div class="movements__row">
+//           <div class="movements__type movements__type--${type}">
+//             ${i+1} ${type}
+//           </div>
+//           <div class="movements__value">${el}</div>
+//         </div>`
+//         containerMovements.insertAdjacentHTML('afterbegin' , html)
+//   })
+// }
+// display(account1.movements)
+// // containerMovements.innerHTML='';
 // function dummyeliments (el , i , type){
 //   const html = `
 //   <div class="movements__row">
@@ -262,3 +324,52 @@ Input: s = "(]"
 Output: false
  
 */
+///reduse 
+// let maximum = movements.reduce((max , el)=> max < el ? max =el : max , movements.at(0))
+// console.log(maximum)
+// let test = movements.reduce(function(acc , mov){
+//   if(acc > mov) return acc;
+//   else return mov
+// } , movements[0])
+// console.log(test)
+// console.log(movements)
+// const calcAverageHumanAge = function(ages){
+//     let humanage = ages.map(function(el){
+//       if (el<=2) return el *2;
+//       else if (el > 2) return 16 + el * 4;
+//     });
+//     let adult = humanage.filter(el => el > 18);
+//     let avarage = adult.reduce((acc , el) => acc + el ,0) /adult.length
+//     return avarage
+    
+// }
+// console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]))
+// console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]))
+
+/// all thing i just learn until now
+// fast one is some array mathod like
+// const valuereturn = movements.map((mov , i , arr) =>{
+//   let type = mov < 0 ? 'withdraw' : 'deposit';
+//   return `Iteration ${i+1} total ${type} is ${mov}`
+// }) 
+// console.log(...valuereturn)
+// const valuefilter = movements.filter(map => map > 0)
+// console.log(valuefilter)
+// const valueReduse = movements.reduce((acc , el)=> acc + el ,0)
+// console.log(valueReduse)
+// let sum = 0;
+// for(let x of movements)sum+=x;
+// console.log(sum)
+// // movements.forEach((mov , i , arr) => console.log(mov , i ,arr)) 
+// console.log (movements.lastIndexOf(450))
+// console.log (movements.slice(1 , -1))
+// console.log (movements)
+// console.log(movements.splice(0 /**the position where the operation will work */, 0 /**the number of element that you want to remove from the array */, /*if you want to add some element from the position then that will be write here*/'hu' , 'la'))
+// console.log (movements)
+// console.log (movements.includes(4000))
+// console.log (movements.includes(3000))
+// console.log (movements.lastIndexOf(450))
+// console.log (movements.lastIndexOf(450))
+// console.log (movements.at(0))
+// console.log (movements.indexOf(400))
+// console.log (movements.indexOf(-400))
