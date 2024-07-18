@@ -71,43 +71,240 @@ const currencies = new Map([
   ]);
   /////////////////////////////////
   const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-    accounts.forEach(function(el){
-      el.userId = el.owner.toLowerCase().split(' ').map(element => element[0]).join('');
-    })
+    
     /////////////////////
-containerMovements.innerHTML= '';
-function display (movements){
-   movements.forEach(function(el,i){
-    const type = el >= 0 ? 'deposit' : 'withdrawal';
-  const html = `
-  <div class="movements__row">
-          <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
-          <div class="movements__value">${el}</div>
-        </div>`;
-        containerMovements.insertAdjacentHTML('afterbegin',html)
-   })
+
+function createuserId (){
+  accounts.forEach(function(el){
+    el.userId = el.owner.toLocaleLowerCase().split(' ').map(el => el[0]).join('')
+  })
 }
-display(account1.movements);
-/////balance
-// const calcBalance = function(movement){
-//   let balacnce = movement.reduce((acc , mov)=> acc + mov , 0)
-//   labelBalance.textContent=`${balacnce}$`;
+createuserId()
+containerMovements.innerHTML = ''
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+function displayMovements (movement , sort = false){
+  containerMovements.innerHTML = '';
+  const mov = sort ? movement.slice().sort((a,b)=> a - b) : movement
+  mov.forEach(function(el , i , arr){
+    const type = el > 0 ? 'deposit' : 'withdrawal';
+    const html = `<div class="movements__row">
+          <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+          <div class="movements__value">${el}€</div>
+        </div>
+        `;
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+})
+}
+let short = false;
+btnSort.addEventListener('click' , function(e){
+  displayMovements(currentUser.movements , !short)
+  short = !short
+})
+/////
+function displayLebels (acc){
+  let deposit = acc.movements.filter(el => el > 0).reduce((acc , el )=> acc + el ,0)
+  let withdrawal = acc.movements.filter(el => el < 0).reduce((acc , el )=> acc + el ,0)
+  let interest = acc.movements.filter(el => el > 0 ).map(el => el * acc.interestRate/100).filter(el => el > 1).reduce((acc , el)=> acc  + el);
+  labelSumInterest.textContent = `${interest}$`
+  labelSumIn.textContent = `${deposit}$`;
+  labelSumOut.textContent = `${Math.abs(withdrawal)}$`;
+}
+
+function balance (movements){
+ let mainBalance = movements.reduce((acc , el ) =>{
+  return acc + el
+ } , 0);
+ labelBalance.textContent = `${mainBalance}$`
+ return mainBalance;
+}
+function UiUpdate(acc){
+  containerMovements.innerHTML = '';
+  balance(acc.movements);
+  displayLebels(acc);
+  displayMovements(acc.movements);
+}
+let currentUser;
+function loginAction(){
+  let userId = inputLoginUsername.value;
+  let userPass = Number(inputLoginPin.value);
+  inputLoginUsername.value = inputLoginPin.value =''
+  inputLoginPin.blur()
+  currentUser = accounts.find(el=> el.userId === userId)
+  if (currentUser?.pin === userPass){
+    containerApp.style.opacity =1
+    UiUpdate(currentUser)
+    labelWelcome.textContent = `welcome ${currentUser.owner.split(' ')[0]}` 
+  }
+  }
+btnLogin.addEventListener('click' , function(e){
+  e.preventDefault()
+  loginAction()
+})
+
+btnTransfer.addEventListener('click' , function(e){
+  e.preventDefault()
+  let transferAccNO = inputTransferTo.value;
+  let transferMoney = Number(inputTransferAmount.value);
+  inputTransferTo.value = inputTransferAmount.value = '';
+  inputTransferAmount.blur()
+  let transferAcc = accounts.find(mov => mov.userId === transferAccNO)
+  if(transferAcc && transferAcc.userId !== currentUser.userId){
+    if(balance(currentUser.movements) >= transferMoney && transferMoney > 0){
+      currentUser.movements.push(-transferMoney);
+      transferAcc.movements.push (transferMoney);
+      UiUpdate(currentUser)
+    }
+    else{
+      console.log('cant be transfer')
+    }
+  }
+  else{
+    alert('Yeo Your Inputed Account is not valid so be carefull when you write one')
+  }
+  
+});
+btnLoan.addEventListener('click', function(e){
+  e.preventDefault();
+  let LoanAmount = Number(inputLoanAmount.value);
+  let chackingDeposit = currentUser.movements.some(el=> el >= LoanAmount * 0.1)
+  if(chackingDeposit){
+    currentUser.movements.push(LoanAmount);
+    UiUpdate(currentUser);
+  }
+  
+})
+btnClose.addEventListener('click' , function(e){
+  e.preventDefault();
+  if(currentUser.userId == inputCloseUsername.value && currentUser.pin === Number(inputClosePin.value)){
+    let index = accounts.findIndex(acc=> acc.userId === currentUser.userId);
+    console.log(index)
+    accounts.splice(index , 1)
+    console.log(accounts)
+    containerApp.style.opacity = 0;
+    currentUser ='';
+    inputClosePin.value = inputCloseUsername.value ='';
+  }
+});
+// console.log(movements)
+// console.log(account4.movements.every(el=> el>0));
+// ///flat mathod 
+// const arr = [1,[2,3],4,5,[6,7],8,9]
+// console.log(arr.flat())
+// console.log(arr.flat(1))
+// //level 1 
+// //and now upper then level 1
+// const arrdeep = [1,[3,4],[5,[6,7,[8,9]]],1,[5,4]];
+// console.log(arrdeep.flat(3))
+// ///over all calculation of all accounts movements
+// const overallcalculation = accounts.map(el=>el.movements).flat().reduce((acc ,el)=> acc + el ,0)
+// console.log(overallcalculation)
+
+// console.log(movements)
+// movements.sort((a ,b)=>{
+//   if (a > b) return -1;
+//   else if (a < b) return 1;
+// })
+// console.log(movements)
+// movements.sort((a ,b)=>{
+//   if (a < b) return -1;
+//   else if (a > b) return 1;
+// })
+// console.log(movements)
+// const arr = new Array(8);
+// arr.fill(3)
+// arr.fill(4 , 5 , 7)
+// console.log(arr)
+// // const arr2 = Array.from({length : 8} , ()=> 3)
+// const arr2 = Array.from({length : 8} , (_ , i)=> i + 1 )
+// console.log(arr2)
+// // the real world  application of this thing now lets test it 
+// labelBalance.addEventListener('click' , function(){
+//   const totalbalance = Array.from(document.querySelectorAll('.movements__value') , el => Number(el.textContent.replace('€','')))
+//   console.log(totalbalance.reduce((acc , el)=>acc + el ,0))
+// })
+// let the_100_random_dice = Array.from({length : 100} , ()=> Math.trunc(Math.random()*6)+1 )
+// console.log(the_100_random_dice)
+// const allDeposit = accounts.map(el => el.movements).flat().filter(el=> el > 0).reduce((acc , el )=> acc + el , 0)
+// const allDeposit = accounts.flatMap(el => el.movements).filter(el=> el > 0).reduce((acc , el )=> acc + el , 0);
+// console.log(allDeposit);
+// const allDepositupto1000 = accounts.flatMap(el=> el.movements).reduce((acc , el)=> el >= 1000 ? acc + el : acc , 0);
+// console.log(allDepositupto1000);
+// const acc = accounts.flatMap(acc=> acc.movements).reduce((acc , el) =>{ 
+//   el > 0 ? (acc.deposit += el) :( acc.withdrawal += el);
+//   return acc;
+// } ,{deposit : 0 , withdrawal : 0});
+// console.log(acc);  
+// const sums = accounts
+//   .flatMap(acc => acc.movements)
+//   .reduce(
+//     (sums, cur) => {
+//       cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
+//       return sums;
+//     },
+//     { deposits: 0, withdrawals: 0 }
+//   );
+// console.log('hasid')
+// console.log(sums);
+// function capatilizationTitle (title){
+//   const exsecption = ['a' , 'an' , 'and' , 'if' , 'but','at'];
+//   const finalExport = title.toLowerCase().split(' ').map(el => exsecption.includes(el) ? el : el.slice(0,1).toUpperCase() + el.slice(1)).join(' ')
+//   return finalExport;
 // }
-// calcBalance(account1.movements)
-///lable
-function dislplayLable(movement){
-let deposit = movement.filter(mov => mov > 0).reduce((acc , balance)=> acc + balance , 0)
-labelSumIn.textContent = `${deposit}€`
-let withdraw = movement.filter(mov => mov < 0).reduce((acc , balance)=> acc + balance , 0)
-labelSumOut.textContent = `${Math.abs(withdraw)}€`
-let interest = movement.map(el => Math.trunc(Math.abs((el * 1.1) / 100))).filter(el => el > 1).reduce((acc , mov)=> acc + mov , 0)
-labelSumInterest.textContent = `${interest}€`
-let balacnce = movement.reduce((acc , mov)=> acc + mov , 0)
-labelBalance.textContent=`${balacnce - interest}€`;
-
-
-}
-dislplayLable(account1.movements)
+// console.log(capatilizationTitle('Hi this is me and i am a developer AT Samsung'));
+// console.log(capatilizationTitle('Hi this is me and i am kf sdfuiRf iuasdyhfAfg  an a developer AT Samsung'));
+// console.log(capatilizationTitle('Hi this is me and i am a  and or developer AT Samsung'));
+// console.log(capatilizationTitle('Hi this is me and i am a developer AT Samsung'));
+// function solution(str){
+//   let shorted = str.split('')
+//   let final =[];
+//   let v = 1;
+//   for (let x = 0 ; x < shorted.length ; x = x + 2){
+//      final.push(`${shorted[x]}${shorted[v] ? shorted[v] : '_'}`)
+//      v = v + 2
+//   }
+//   return final;
+  
+// }
+// console.log(solution('abcde'))
+// function arrayDiff(a, b) {
+//   let z =[];
+//   a.forEach(el => {
+//     if(!b.includes(el)){
+//     z.push(el);
+//   }})
+//   let final =  z.sort((a ,b)=> a-b);
+//   return final
+// }
+// function arrayDiff(a, b) {
+//   let result =[];
+//   a.forEach(el => !b.includes(el) ? result.push(el) : '')
+//   return result.sort((a ,b)=> a-b)
+// }
+// console.log(arrayDiff([1,2,2,2,3],[2]))
+// console.log(arrayDiff([-11,-14,-8,-7,11,0,6,0,1,12,-10,-5,-2,-11,-12],[-11,-14,-8,-7]))
+// console.log(arrayDiff([-19,-19,-9,-20,-10,15,-1,13,6,-17,5,-15,-19,-1,1,17,19,16,7],[-19,-19]))
+// console.log([8,4,2,5,2,1,5,7,8,3].sort((a ,b)=> b-a).includes(3))
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+  ];
+dogs.forEach(el=> el['recommendedFood'] = (Math.trunc((el.weight ** 0.75 )* 28)))
+console.log(dogs)
+const sarahdog = dogs.find(el => el.owners.includes('Sarah'))
+console.log(`sarahdog is currently eting ${sarahdog.curFood} and the recomedation food is ${sarahdog.recommendedFood} so sarah dog is eting too ${sarahdog.recommendedFood < sarahdog.curFood ? 'Much' : 'little'}`);
+const ownerListEtingMuch = dogs.filter(el=> el.recommendedFood < el.curFood).map(el=> el.owners).flat().sort();
+const ownerListEtingLittle = dogs.filter(el=> el.recommendedFood > el.curFood).map(el=> el.owners).flat().sort();
+console.log(`${ownerListEtingMuch.join(' and ')} their dogs is eating too much`)
+console.log(`${ownerListEtingLittle.join(' and ')} their dogs is eating too little`)
+console.log(`There is ${dogs.some(el => el.curFood === el.recommendedFood) ? 'yet some' : 'no'} dogs eating the recomanded food.`)
+const chackDogEatigOkey = el => el.curFood > el.recommendedFood * .9 && el.curFood < el.recommendedFood * 1.1
+console.log(dogs.some (chackDogEatigOkey))
+let chackownerokey = dogs.filter(chackDogEatigOkey).map(el => el.owners).flat()
+console.log(`There is ${chackownerokey ? chackownerokey.join(' ') : 'no'} dog${chackownerokey.length > 1 ? 's' : ''} is eating okey`)
+let dogSorted = dogs.slice().sort((a , b) => a.recommendedFood - b.recommendedFood);
+console.log(dogSorted)
 // labelSumIn
 //from me if i click the short button;
 // let ShortonlydepositwithERO = function (){
